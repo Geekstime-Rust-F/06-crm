@@ -16,7 +16,7 @@ path = "src/client.rs"
 anyhow = { workspace = true }
 prost = { workspace = true }
 prost-types = { workspace = true }
-tokio = { version = "1.41.1", features = ["rt-multi-thread"] }
+tokio = { workspace = true }
 tonic = { workspace = true }
 
 [build-dependencies]

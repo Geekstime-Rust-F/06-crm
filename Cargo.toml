@@ -1,5 +1,5 @@
 [workspace]
-members = ["crm"]
+members = ["crm", "user-stat"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -9,3 +9,6 @@ prost-build = "0.13.3"
 prost-types = "0.13.3"
 tonic = "0.12.3"
 tonic-build = "0.12.3"
+sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "tls-rustls"] }
+tokio = { version = "1.41.1", features = ["rt-multi-thread"] }
+serde_yaml = "0.9.34"
