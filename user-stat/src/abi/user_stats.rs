@@ -7,16 +7,16 @@ use std::pin::Pin;
 use tonic::{Response, Status};
 
 use crate::{
-    pb::{user_stats_service_server::UserStatsServiceServer, QueryRequest, RawQueryRequest, User},
-    ServiceResult, UserStatsServer,
+    pb::{user_stats_server::UserStatsServer, QueryRequest, RawQueryRequest, User},
+    ServiceResult, UserStatsService,
 };
 
 #[allow(unused)]
 type ResponseStream = Pin<Box<dyn Stream<Item = Result<User, Status>> + Send>>;
 
 #[allow(unused)]
-impl UserStatsServer {
-    async fn query(&self, request: QueryRequest) -> ServiceResult<ResponseStream> {
+impl UserStatsService {
+    pub async fn query(&self, request: QueryRequest) -> ServiceResult<ResponseStream> {
         let mut sql = "SELECT * FROM user_stats WHERE ".to_string();
 
         let time_conditions = request
@@ -41,7 +41,7 @@ impl UserStatsServer {
         self.raw_query(RawQueryRequest { query: sql }).await
     }
 
-    async fn raw_query(&self, request: RawQueryRequest) -> ServiceResult<ResponseStream> {
+    pub async fn raw_query(&self, request: RawQueryRequest) -> ServiceResult<ResponseStream> {
         let ret: Vec<User> = sqlx::query_as(&request.query)
             .fetch_all(&self.inner.pool)
             .await
@@ -53,9 +53,9 @@ impl UserStatsServer {
     }
 }
 
-impl UserStatsServer {
-    pub fn into_service(self) -> UserStatsServiceServer<UserStatsServer> {
-        UserStatsServiceServer::new(self)
+impl UserStatsService {
+    pub fn into_server(self) -> UserStatsServer<UserStatsService> {
+        UserStatsServer::new(self)
     }
 }
 
@@ -104,7 +104,7 @@ mod tests {
     #[tokio::test]
     async fn raw_query_should_work() -> Result<()> {
         let config = AppConfig::load().unwrap();
-        let svc = UserStatsServer::new(config).await?;
+        let svc = UserStatsService::new(config).await?;
         let mut ret = svc.raw_query(RawQueryRequest { query: "SELECT * FROM user_stats WHERE created_at BETWEEN '2023-01-01' AND '2024-01-02' LIMIT 5;".to_string() }).await?.into_inner();
 
         while let Some(user) = ret.next().await {
@@ -117,7 +117,7 @@ mod tests {
     #[tokio::test]
     async fn query_should_work() -> Result<()> {
         let config = AppConfig::load().unwrap();
-        let svc = UserStatsServer::new(config).await?;
+        let svc = UserStatsService::new(config).await?;
         let query_request = QueryRequestBuilder::default()
             .timestamp(("created_at".to_string(), form_time_query(Some(100), None)))
             .timestamp((

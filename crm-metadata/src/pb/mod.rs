@@ -1,5 +1,5 @@
 #[allow(non_camel_case_types)]
 #[rustfmt::skip]
-mod user_stats;
+mod metadata;
 
-pub use user_stats::*;
+pub use metadata::*;

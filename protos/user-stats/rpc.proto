@@ -4,7 +4,7 @@ package user_stats;
 
 import "message.proto";
 
-service UserStatsService {
+service UserStats {
     rpc query(QueryRequest) returns (stream User);
     rpc raw_query(RawQueryRequest) returns (stream User);
 }
