@@ -25,8 +25,9 @@ type ResponseStream = Pin<Box<dyn Stream<Item = Result<SendResponse, Status>> + 
 #[async_trait]
 impl Notification for NotificationService {
     type sendStream = ResponseStream;
+
     async fn send(&self, req: Request<Streaming<SendRequest>>) -> ServiceResult<ResponseStream> {
-        self.send(req).await
+        self.send(req.into_inner()).await
     }
 }
 

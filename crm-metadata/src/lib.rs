@@ -9,7 +9,7 @@ pub use config::AppConfig;
 use futures::Stream;
 use pb::{
     metadata_server::{Metadata, MetadataServer},
-    Content, MeterializeRequest,
+    Content, MaterializeRequest,
 };
 use tonic::{async_trait, Request, Response, Status, Streaming};
 
@@ -33,12 +33,12 @@ impl MetadataService {
 
 #[async_trait]
 impl Metadata for MetadataService {
-    type meterializeStream = ResponseStream;
+    type MaterializeStream = ResponseStream;
 
-    async fn meterialize(
+    async fn materialize(
         &self,
-        request: Request<Streaming<MeterializeRequest>>,
-    ) -> ServiceResult<Self::meterializeStream> {
+        request: Request<Streaming<MaterializeRequest>>,
+    ) -> ServiceResult<Self::MaterializeStream> {
         self.meterialize(request.into_inner()).await
     }
 }

@@ -4,6 +4,7 @@ mod sms;
 
 use std::{sync::Arc, time::Duration};
 
+use chrono::Timelike;
 use futures::Stream;
 use tokio::{sync::mpsc, time::sleep};
 use tokio_stream::wrappers::ReceiverStream;
@@ -15,7 +16,7 @@ use crate::{
 };
 use futures::StreamExt;
 
-const CHANNEL_SIZE: usize = 128;
+const CHANNEL_SIZE: usize = 1024;
 
 impl NotificationService {
     pub fn new() -> Self {
@@ -31,7 +32,7 @@ impl NotificationService {
     }
 
     pub async fn send(
-        self,
+        &self,
         mut req: impl Stream<Item = Result<SendRequest, Status>> + Send + Unpin + 'static,
     ) -> ServiceResult<ResponseStream> {
         let (tx, rx) = mpsc::channel(CHANNEL_SIZE);
@@ -51,23 +52,36 @@ impl NotificationService {
             }
         });
         let out_stream = ReceiverStream::new(rx);
-        Ok(Response::new(Box::pin(out_stream) as ResponseStream))
+        Ok(Response::new(Box::pin(out_stream)))
     }
 }
 
+impl Default for NotificationService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 pub trait Sender {
     async fn send(self, svc: NotificationService) -> Result<SendResponse, Status>;
 }
 
 fn dummy_send() -> mpsc::Sender<Msg> {
-    let (tx, mut rx) = mpsc::channel(CHANNEL_SIZE);
+    let (tx, mut rx) = mpsc::channel(CHANNEL_SIZE * 100);
     tokio::spawn(async move {
         while let Some(msg) = rx.recv().await {
-            println!("{:?}", msg);
+            println!("dummy send msg: {:?}", msg);
             sleep(Duration::from_millis(300)).await;
         }
     });
     tx
+}
+
+fn now_timestamp() -> prost_types::Timestamp {
+    let now = chrono::Utc::now();
+    prost_types::Timestamp {
+        seconds: now.timestamp(),
+        nanos: now.nanosecond() as i32,
+    }
 }
 
 #[cfg(test)]

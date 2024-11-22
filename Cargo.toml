@@ -1,5 +1,5 @@
 [workspace]
-members = ["crm", "crm-metadata", "crm-send", "user-stat"]
+members = ["crm", "crm-metadata", "notification", "user-stat"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -12,3 +12,9 @@ tonic-build = "0.12.3"
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "tls-rustls"] }
 tokio = { version = "1.41.1", features = ["rt-multi-thread"] }
 serde_yaml = "0.9.34"
+rand = "0.8.5"
+crm = { path = "crm" }
+crm-metadata = { path = "crm-metadata" }
+notification = { path = "notification" }
+user-stat = { path = "user-stat" }
+tokio-stream = "0.1.16"

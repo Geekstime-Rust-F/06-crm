@@ -6,7 +6,7 @@ use crate::{
     NotificationService,
 };
 
-use super::Sender;
+use super::{now_timestamp, Sender};
 
 impl Sender for SmsMessage {
     async fn send(self, svc: NotificationService) -> Result<SendResponse, Status> {
@@ -18,20 +18,20 @@ impl Sender for SmsMessage {
 
         Ok(SendResponse {
             message_id,
-            sent_at: None,
+            sent_at: Some(now_timestamp()),
         })
     }
 }
 
-impl Into<SendRequest> for SmsMessage {
-    fn into(self) -> SendRequest {
+impl From<SmsMessage> for SendRequest {
+    fn from(msg: SmsMessage) -> Self {
         SendRequest {
-            msg: Some(Msg::Sms(self)),
+            msg: Some(Msg::Sms(msg)),
         }
     }
 }
 
-#[cfg(test)]
+#[cfg(feature = "test_utils")]
 impl SmsMessage {
     pub fn fake() -> Self {
         use fake::{faker::phone_number::en::PhoneNumber, Fake};

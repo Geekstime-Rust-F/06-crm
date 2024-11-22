@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package notification;
+
+import "message.proto";
+
+service Notification {
+    rpc send(stream SendRequest) returns (stream SendResponse);
+}

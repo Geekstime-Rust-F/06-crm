@@ -13,7 +13,7 @@ tonic.workspace = true
 sqlx = { workspace = true, features = ["chrono"] }
 chrono = { version = "0.4.38", features = ["serde"] }
 serde = { version = "1.0.215", features = ["derive"] }
-rand = "0.8.5"
+rand = { workspace =  true }
 nanoid = "0.4.0"
 derive_builder = "0.20.2"
 serde_yaml = { workspace = true }
@@ -22,7 +22,7 @@ futures = "0.3.31"
 tracing-subscriber = "0.3.18"
 tracing = "0.1.40"
 fake = { version = "3.0.1", features = ["derive", "chrono"] }
-tokio-stream = "0.1.16"
+tokio-stream = { workspace = true }
 
 [build-dependencies]
 anyhow = { workspace = true }

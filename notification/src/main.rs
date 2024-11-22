@@ -16,7 +16,7 @@ async fn main() -> Result<()> {
     let addr = format!("[::1]:{}", port).parse().unwrap();
     info!("Notification Server listening on {}", addr);
 
-    let notification_server = NotificationService::new().into_service();
+    let notification_server = NotificationService::default().into_service();
 
     Server::builder()
         .add_service(notification_server)

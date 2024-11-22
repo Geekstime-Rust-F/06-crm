@@ -16,7 +16,7 @@ pub struct Content {
     #[prost(enumeration = "ContentType", tag = "7")]
     pub r#type: i32,
     #[prost(message, optional, tag = "8")]
-    pub create_at: ::core::option::Option<::prost_types::Timestamp>,
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(uint64, tag = "9")]
     pub views: u64,
     #[prost(uint64, tag = "10")]
@@ -34,7 +34,7 @@ pub struct Publisher {
     pub avatar: ::prost::alloc::string::String,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
-pub struct MeterializeRequest {
+pub struct MaterializeRequest {
     #[prost(uint32, tag = "1")]
     pub id: u32,
 }
@@ -167,10 +167,10 @@ pub mod metadata_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn meterialize(
+        pub async fn materialize(
             &mut self,
             request: impl tonic::IntoStreamingRequest<
-                Message = super::MeterializeRequest,
+                Message = super::MaterializeRequest,
             >,
         ) -> std::result::Result<
             tonic::Response<tonic::codec::Streaming<super::Content>>,
@@ -186,11 +186,11 @@ pub mod metadata_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/metadata.Metadata/meterialize",
+                "/metadata.Metadata/Materialize",
             );
             let mut req = request.into_streaming_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("metadata.Metadata", "meterialize"));
+                .insert(GrpcMethod::new("metadata.Metadata", "Materialize"));
             self.inner.streaming(req, path, codec).await
         }
     }
@@ -208,17 +208,17 @@ pub mod metadata_server {
     /// Generated trait containing gRPC methods that should be implemented for use with MetadataServer.
     #[async_trait]
     pub trait Metadata: std::marker::Send + std::marker::Sync + 'static {
-        /// Server streaming response type for the meterialize method.
-        type meterializeStream: tonic::codegen::tokio_stream::Stream<
+        /// Server streaming response type for the Materialize method.
+        type MaterializeStream: tonic::codegen::tokio_stream::Stream<
                 Item = std::result::Result<super::Content, tonic::Status>,
             >
             + std::marker::Send
             + 'static;
-        async fn meterialize(
+        async fn materialize(
             &self,
-            request: tonic::Request<tonic::Streaming<super::MeterializeRequest>>,
+            request: tonic::Request<tonic::Streaming<super::MaterializeRequest>>,
         ) -> std::result::Result<
-            tonic::Response<Self::meterializeStream>,
+            tonic::Response<Self::MaterializeStream>,
             tonic::Status,
         >;
     }
@@ -298,15 +298,15 @@ pub mod metadata_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/metadata.Metadata/meterialize" => {
+                "/metadata.Metadata/Materialize" => {
                     #[allow(non_camel_case_types)]
-                    struct meterializeSvc<T: Metadata>(pub Arc<T>);
+                    struct MaterializeSvc<T: Metadata>(pub Arc<T>);
                     impl<
                         T: Metadata,
-                    > tonic::server::StreamingService<super::MeterializeRequest>
-                    for meterializeSvc<T> {
+                    > tonic::server::StreamingService<super::MaterializeRequest>
+                    for MaterializeSvc<T> {
                         type Response = super::Content;
-                        type ResponseStream = T::meterializeStream;
+                        type ResponseStream = T::MaterializeStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,
                             tonic::Status,
@@ -314,12 +314,12 @@ pub mod metadata_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                tonic::Streaming<super::MeterializeRequest>,
+                                tonic::Streaming<super::MaterializeRequest>,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Metadata>::meterialize(&inner, request).await
+                                <T as Metadata>::materialize(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -330,7 +330,7 @@ pub mod metadata_server {
                     let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
-                        let method = meterializeSvc(inner);
+                        let method = MaterializeSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

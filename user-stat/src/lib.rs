@@ -48,3 +48,78 @@ impl UserStats for UserStatsService {
         self.raw_query(request.into_inner()).await
     }
 }
+
+#[cfg(feature = "test_utils")]
+pub mod test_utils {
+    use anyhow::Result;
+    use sqlx::{Executor, PgPool};
+    use std::{path::Path, sync::Arc};
+
+    use chrono::{DateTime, Timelike, Utc};
+    use prost_types::Timestamp;
+    use sqlx_db_tester::TestPg;
+
+    use crate::{
+        pb::{IdQuery, TimeQuery},
+        AppConfig, UserStatsService, UserStatsSeverInner,
+    };
+
+    impl UserStatsService {
+        pub async fn new_for_test() -> Result<(TestPg, Self)> {
+            let config = AppConfig::load()?;
+            let db_url = config.database.get_url_without_database();
+
+            let (tdb, pool) = get_test_pool(Some(&db_url)).await;
+
+            let svc = UserStatsService {
+                inner: Arc::new(UserStatsSeverInner { pool }),
+            };
+
+            Ok((tdb, svc))
+        }
+    }
+
+    pub async fn get_test_pool(db_url: Option<&str>) -> (TestPg, PgPool) {
+        let url = db_url.unwrap_or("postgres://postgres:mysecretpassword@localhost");
+        let tdb = TestPg::new(url.to_string(), Path::new("./migrations"));
+        let pool = tdb.get_pool().await;
+
+        let sqls = include_str!("../fixtures/test.sql").split(";");
+        let mut transaction = pool.begin().await.expect("begin transaction failed");
+        for sql in sqls {
+            if sql.trim().is_empty() {
+                continue;
+            }
+            transaction.execute(sql).await.expect("execute sql failed");
+        }
+        transaction.commit().await.unwrap();
+
+        (tdb, pool)
+    }
+
+    pub fn before(days: Option<u64>) -> DateTime<Utc> {
+        if days.is_none() {
+            return Utc::now();
+        }
+        Utc::now() - chrono::Duration::days(days.unwrap() as i64)
+    }
+
+    pub fn form_time_query(start: Option<u64>, end: Option<u64>) -> TimeQuery {
+        let start = before(start);
+        let end = before(end);
+        TimeQuery {
+            start: Some(Timestamp {
+                seconds: start.timestamp(),
+                nanos: start.nanosecond() as i32,
+            }),
+            end: Some(Timestamp {
+                seconds: end.timestamp(),
+                nanos: start.nanosecond() as i32,
+            }),
+        }
+    }
+
+    pub fn id(id: &[u32]) -> IdQuery {
+        IdQuery { ids: id.to_vec() }
+    }
+}

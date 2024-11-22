@@ -42,13 +42,13 @@ impl AppConfig {
 impl DatabaseConfig {
     pub fn get_url_with_database(&self) -> String {
         format!(
-            "postgresql://{}:{}@{}:{}/{}",
+            "postgres://{}:{}@{}:{}/{}",
             self.username, self.password, self.host, self.port, self.database
         )
     }
     pub fn get_url_without_database(&self) -> String {
         format!(
-            "postgresql://{}:{}@{}:{}",
+            "postgres://{}:{}@{}:{}",
             self.username, self.password, self.host, self.port
         )
     }

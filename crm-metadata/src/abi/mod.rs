@@ -11,7 +11,7 @@ use tokio_stream::wrappers::ReceiverStream;
 use tonic::Response;
 
 use crate::{
-    pb::{Content, ContentType, MeterializeRequest, Publisher},
+    pb::{Content, ContentType, MaterializeRequest, Publisher},
     MetadataService, ResponseStream, ServiceResult,
 };
 
@@ -20,7 +20,7 @@ const CHANNEL_SIZE: usize = 128;
 impl MetadataService {
     pub async fn meterialize(
         &self,
-        mut in_stream: impl Stream<Item = Result<MeterializeRequest, tonic::Status>>
+        mut in_stream: impl Stream<Item = Result<MaterializeRequest, tonic::Status>>
             + Send
             + Unpin
             + 'static,
@@ -58,10 +58,10 @@ impl Content {
             url: "https://placehold.co/1600x900".to_string(),
             image: "https://placehold.co/1600x900".to_string(),
             r#type: (0..6).fake(),
-            create_at: created_at(),
             views: rng.gen_range(12344..1000000),
             likes: rng.gen_range(1234..10000),
             dislikes: rng.gen_range(123..10000),
+            created_at: created_at(),
         }
     }
 }
@@ -122,9 +122,9 @@ mod tests {
         let service = MetadataService::new(config);
 
         let req_stream = tokio_stream::iter(vec![
-            Ok(MeterializeRequest { id: 1 }),
-            Ok(MeterializeRequest { id: 2 }),
-            Ok(MeterializeRequest { id: 3 }),
+            Ok(MaterializeRequest { id: 1 }),
+            Ok(MaterializeRequest { id: 2 }),
+            Ok(MaterializeRequest { id: 3 }),
         ]);
 
         let resp = service.meterialize(req_stream).await?;
