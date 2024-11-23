@@ -64,6 +64,18 @@ impl Content {
             created_at: created_at(),
         }
     }
+
+    pub fn to_body(&self) -> String {
+        format!("Content: {:?}", self)
+    }
+}
+
+pub struct Template<'a>(pub &'a [Content]);
+
+impl<'a> Template<'a> {
+    pub fn to_body(&self) -> String {
+        format!("Contents: {:?}", self.0)
+    }
 }
 
 impl Publisher {

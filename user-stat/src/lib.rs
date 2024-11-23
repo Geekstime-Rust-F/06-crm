@@ -97,16 +97,7 @@ pub mod test_utils {
         (tdb, pool)
     }
 
-    pub fn before(days: Option<u64>) -> DateTime<Utc> {
-        if days.is_none() {
-            return Utc::now();
-        }
-        Utc::now() - chrono::Duration::days(days.unwrap() as i64)
-    }
-
-    pub fn form_time_query(start: Option<u64>, end: Option<u64>) -> TimeQuery {
-        let start = before(start);
-        let end = before(end);
+    pub fn form_time_query(start: DateTime<Utc>, end: DateTime<Utc>) -> TimeQuery {
         TimeQuery {
             start: Some(Timestamp {
                 seconds: start.timestamp(),

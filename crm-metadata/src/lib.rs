@@ -1,4 +1,5 @@
 mod abi;
+pub use abi::Template;
 mod config;
 
 pub mod pb;

@@ -1,14 +1,23 @@
-use crm::pb::{user_service_client::UserServiceClient, GetUserRequest};
-use tonic::Request;
+use anyhow::Result;
+use crm::{
+    pb::{crm_client::CrmClient, WelcomeRequestBuilder},
+    AppConfig,
+};
+use uuid::Uuid;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = UserServiceClient::connect("http://[::1]:50051").await?;
+async fn main() -> Result<()> {
+    let config = AppConfig::load().unwrap();
+    let addr = format!("http://[::1]:{}", config.server.port);
+    let mut client = CrmClient::connect(addr).await?;
+    let welcome_request = WelcomeRequestBuilder::default()
+        .id(Uuid::new_v4().to_string())
+        .interval(7u32)
+        .content_ids([8735])
+        .build()?;
 
-    let request = Request::new(GetUserRequest { id: 1 });
-    let response = client.get_user(request).await?;
-
-    println!("Response: {:?}", response);
+    let res = client.welcome(welcome_request).await?.into_inner();
+    println!("{:?}", res);
 
     Ok(())
 }

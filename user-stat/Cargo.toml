@@ -15,23 +15,23 @@ prost-types = { workspace = true }
 tokio = { workspace = true }
 tonic = { workspace = true }
 sqlx = { workspace = true, features = ["chrono"] }
-chrono = { version = "0.4.38", features = ["serde"] }
-serde = { version = "1.0.215", features = ["derive"] }
+chrono = { workspace = true }
+serde = { workspace = true }
 rand = "0.8.5"
 nanoid = "0.4.0"
-derive_builder = "0.20.2"
+derive_builder = { workspace = true }
 serde_yaml = { workspace = true }
 itertools = "0.13.0"
 futures = "0.3.31"
-tracing-subscriber = "0.3.18"
-tracing = "0.1.40"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 tokio-stream = { workspace = true }
 sqlx-db-tester = {version = "0.5.0", optional = true }
 
 [build-dependencies]
 anyhow = { workspace = true }
 prost-build = { workspace = true }
-proto-builder-trait = "0.6.2"
+proto-builder-trait = { workspace = true }
 tonic-build = { workspace = true }
 
 [dev-dependencies]

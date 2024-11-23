@@ -18,7 +18,7 @@ impl AppConfig {
     pub fn load() -> Result<Self> {
         let config = match (
             File::open("notification.yml"),
-            env::var("NOTIFY_SERVER_CONFIG"),
+            env::var("NOTIFICATION_SERVER_CONFIG"),
         ) {
             (Ok(file), _) => serde_yaml::from_reader(file),
             (_, Ok(config)) => serde_yaml::from_reader(File::open(config)?),

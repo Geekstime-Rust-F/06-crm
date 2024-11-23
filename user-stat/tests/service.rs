@@ -1,6 +1,7 @@
 use std::{net::SocketAddr, time::Duration};
 
 use anyhow::Result;
+use chrono::{TimeZone, Utc};
 use futures::StreamExt;
 use sqlx_db_tester::TestPg;
 use tokio::{net::TcpListener, time::sleep};
@@ -38,13 +39,12 @@ async fn query_should_work() -> Result<()> {
     let mut client =
         UserStatsClient::connect(format!("http://[{}]:{}", addr.ip(), addr.port())).await?;
 
+    let start = Utc.with_ymd_and_hms(2023, 5, 10, 0, 0, 0).unwrap();
+    let end = Utc.with_ymd_and_hms(2023, 7, 10, 0, 0, 0).unwrap();
+
     let query_request = QueryRequestBuilder::default()
-        .timestamp(("created_at".to_string(), form_time_query(Some(1000), None)))
-        .timestamp((
-            "last_visited_at".to_string(),
-            form_time_query(Some(100), None),
-        ))
-        .id(("viewed_but_not_started".to_string(), id(&[16052])))
+        .timestamp(("created_at".to_string(), form_time_query(start, end)))
+        .id(("viewed_but_not_started".to_string(), id(&[12856])))
         .build()?;
 
     let request = Request::new(query_request);

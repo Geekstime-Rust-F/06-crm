@@ -11,6 +11,7 @@ tonic = "0.12.3"
 tonic-build = "0.12.3"
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "tls-rustls"] }
 tokio = { version = "1.41.1", features = ["rt-multi-thread"] }
+serde = { version = "1.0.215", features = ["derive"] }
 serde_yaml = "0.9.34"
 rand = "0.8.5"
 crm = { path = "crm" }
@@ -18,3 +19,8 @@ crm-metadata = { path = "crm-metadata" }
 notification = { path = "notification" }
 user-stat = { path = "user-stat" }
 tokio-stream = "0.1.16"
+proto-builder-trait = "0.6.2"
+derive_builder = "0.20.2"
+tracing-subscriber = "0.3.18"
+tracing = "0.1.40"
+chrono = { version = "0.4.38", features = ["serde"] }
