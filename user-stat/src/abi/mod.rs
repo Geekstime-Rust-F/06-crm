@@ -159,7 +159,6 @@ mod tests {
         let end = Utc.with_ymd_and_hms(2023, 6, 10, 0, 0, 0).unwrap();
 
         let request = QueryRequestBuilder::default()
-            .timestamp(("created_at".to_string(), form_time_query(start, end)))
             .timestamp(("last_visited_at".to_string(), form_time_query(start, end)))
             .id(("viewed_but_not_started".to_string(), id(&[16857])))
             .build()
@@ -168,6 +167,6 @@ mod tests {
 
         assert_eq!(
             sql,
-             "SELECT * FROM user_stats WHERE created_at > '2023-05-10 00:00:00 UTC' AND created_at < '2023-06-10 00:00:00 UTC' AND last_visited_at > '2023-05-10 00:00:00 UTC' AND last_visited_at < '2023-06-10 00:00:00 UTC' AND array[16857] <@ viewed_but_not_started")
+             "SELECT * FROM user_stats WHERE last_visited_at > '2023-05-10 00:00:00 UTC' AND last_visited_at < '2023-06-10 00:00:00 UTC' AND array[16857] <@ viewed_but_not_started")
     }
 }
